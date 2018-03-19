@@ -1973,3 +1973,7 @@ jr_define( 'DATATABLES_COLVIS', 'Column Visibility');
 
 jr_define( 'API_TOKEN_LIFETIME', 'API token lifetime');
 jr_define( 'API_TOKEN_LIFETIME_DESC', 'How long an API token remains valid for, in seconds. 86400 = 1 day, 31536000 = 1 year');
+
+jr_define( '_JOMRES_PROPERTY_ROOM_TYPES_EDIT', 'Room types' );
+jr_define( '_JOMRES_PROPERTY_ROOM_TYPES_NEW', 'New Room type' );
+jr_define( '_JOMRES_PROPERTY_ROOM_TYPES_EDIT_LEAD', 'You can create and edit room types on this page.' );
