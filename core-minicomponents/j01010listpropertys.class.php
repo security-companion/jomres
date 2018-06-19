@@ -329,11 +329,13 @@ class j01010listpropertys
 					}
 				}
 
-				foreach ($propertysToShow as $propertys_uid) { 
+				foreach ($propertysToShow as $propertys_uid) {
 					$property_deets = array();
 					set_showtime('property_uid', $propertys_uid);
 					set_showtime('property_type', $current_property_details->multi_query_result[ $propertys_uid ]['property_type']);
-
+					
+					$property_deets['PTYPE_ID'] = $current_property_details->multi_query_result[ $propertys_uid ]['ptype_id'];
+					
 					$mrConfig = getPropertySpecificSettings($propertys_uid);
 
 					$property_deets['GATEWAYS'] = '';
@@ -767,34 +769,84 @@ class j01010listpropertys
 					$property_details[ ] = $property_deets;
 				}
 				
-
+				// Experimental feature, not enabled yet because it misses out various override features
+				// Purpose of the exercise is to have different cards for different property types
+				$individual_property_list_cards = false;
 
 				if (!$data_only) {
-					if (!AJAXCALL || get_showtime('task') == 'ajax_search_filter') {
-						$header_pageoutput[ ] = $header_output;
+					if ($individual_property_list_cards) { // Experimental feature
+						//////////////////////////////////////// Individual property cards start
+						
+						// Temporary
+						$layout_template = 'card_property_list_layout_list.html';
+						
+						$cards = array();
+						foreach ($property_details as $property) {
+							$p=array($property);
+							set_showtime('ptype_id', $property['PTYPE_ID'] );
+							$tmpl = new patTemplate();
+							$tmpl->addRows('pageoutput', $p);
+							$tmpl->setRoot(JOMRES_TEMPLATEPATH_FRONTEND);
+							$tmpl->readTemplatesFromInput('card_property_list.html');
+							$cards[] = array ("CARD" => $tmpl->getParsedTemplate() );
+							
+						}
+
+						if (!AJAXCALL || get_showtime('task') == 'ajax_search_filter') {
+							$header_pageoutput[ ] = $header_output;
+							$tmpl = new patTemplate();
+							$tmpl->addRows('header_pageoutput', $header_pageoutput);
+							$tmpl->addRows('layout_rows', $layout_rows);
+							$tmpl->addRows('compare', $compare);
+							$tmpl->addRows('shortlist', $shortlist);
+
+							$tmpl->addRows('budget_output', $budget_output);
+							$tmpl->setRoot(JOMRES_TEMPLATEPATH_FRONTEND);
+							$tmpl->readTemplatesFromInput('list_properties_header.html');
+							$output[ 'HEADER' ] = $tmpl->getParsedTemplate();
+						}
+
+						$pageoutput[ ] = $output;
 						$tmpl = new patTemplate();
-						$tmpl->addRows('header_pageoutput', $header_pageoutput);
-						$tmpl->addRows('layout_rows', $layout_rows);
-						$tmpl->addRows('compare', $compare);
-						$tmpl->addRows('shortlist', $shortlist);
+						if (isset($property_reviews)) {
+							$tmpl->addRows('property_reviews', $property_reviews);
+						}
 
-						$tmpl->addRows('budget_output', $budget_output);
-						$tmpl->setRoot(JOMRES_TEMPLATEPATH_FRONTEND);
-						$tmpl->readTemplatesFromInput('list_properties_header.html');
-						$output[ 'HEADER' ] = $tmpl->getParsedTemplate();
+						$tmpl->addRows('pageoutput', $pageoutput);
+						$tmpl->addRows('cards', $cards);
+						$tmpl->setRoot($layout_path_to_template);
+						$tmpl->readTemplatesFromInput($layout_template);
+						$tmpl->displayParsedTemplate();
+						
+						//////////////////////////////////////// Individual property cards end
+					} else {
+						if (!AJAXCALL || get_showtime('task') == 'ajax_search_filter') {
+							$header_pageoutput[ ] = $header_output;
+							$tmpl = new patTemplate();
+							$tmpl->addRows('header_pageoutput', $header_pageoutput);
+							$tmpl->addRows('layout_rows', $layout_rows);
+							$tmpl->addRows('compare', $compare);
+							$tmpl->addRows('shortlist', $shortlist);
+
+							$tmpl->addRows('budget_output', $budget_output);
+							$tmpl->setRoot(JOMRES_TEMPLATEPATH_FRONTEND);
+							$tmpl->readTemplatesFromInput('list_properties_header.html');
+							$output[ 'HEADER' ] = $tmpl->getParsedTemplate();
+						}
+
+						$pageoutput[ ] = $output;
+						$tmpl = new patTemplate();
+						if (isset($property_reviews)) {
+							$tmpl->addRows('property_reviews', $property_reviews);
+						}
+
+						$tmpl->addRows('pageoutput', $pageoutput);
+						$tmpl->addRows('property_details', $property_details);
+						$tmpl->setRoot($layout_path_to_template);
+						$tmpl->readTemplatesFromInput($layout_template);
+						$tmpl->displayParsedTemplate();
 					}
-
-					$pageoutput[ ] = $output;
-					$tmpl = new patTemplate();
-					if (isset($property_reviews)) {
-						$tmpl->addRows('property_reviews', $property_reviews);
-					}
-
-					$tmpl->addRows('pageoutput', $pageoutput);
-					$tmpl->addRows('property_details', $property_details);
-					$tmpl->setRoot($layout_path_to_template);
-					$tmpl->readTemplatesFromInput($layout_template);
-					$tmpl->displayParsedTemplate();
+					
 				} else {
 					include JOMRES_TEMPLATEPATH_FRONTEND.JRDS.'main.php';
 					$jomres_remote_xml = new SimpleXMLElement($xmlstr);

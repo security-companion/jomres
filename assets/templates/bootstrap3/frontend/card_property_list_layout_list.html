@@ -1,0 +1,30 @@
+
+<patTemplate:tmpl name="pageoutput" unusedvars="strip">
+{JOMRES_POPUPURL_GLOBALVAR}
+
+{HEADER}
+
+<patTemplate:comment>
+<div class="row">
+	<div class="col-md-12">
+		{PAGING}
+	</div>
+</div>
+</patTemplate:comment>
+
+<div class="row">
+	<patTemplate:tmpl name="cards" unusedvars="strip">
+		{CARD}
+	</patTemplate:tmpl>
+</div>
+
+<div id = "livescrolling_results" ></div>
+
+<div class="row">
+	<div class="col-md-12">
+		{PAGING}
+	</div>
+</div>
+
+<patTemplate:comment>{HEADER}</patTemplate:comment>
+</patTemplate:tmpl>
